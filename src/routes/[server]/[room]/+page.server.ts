@@ -3,18 +3,17 @@ import { Connection } from "$lib/storage";
 const connection = new Connection();
 
 export const load: PageLoad = ({ params }) => {
-  const messages = connection.messages();
-  console.log({ messages });
-  return { messages: JSON.stringify(messages) };
+  return { room: params.room };
 };
 
 import type { Actions } from "./$types";
-
+const did = "did:plc:ngokl2gnmpbvuvrfckja3g7p";
 export const actions = {
   default: async ({ request }) => {
     const data = await request.formData();
+    console.log({ data });
     const message = data.get("message")! as string;
-    // TODO log the user in
-    connection.insertMessage(message);
+    const channel = data.get("room")! as string;
+    connection.insertMessage(message, did, channel);
   },
 } satisfies Actions;
