@@ -4,6 +4,6 @@ const connection = new Connection();
 
 export const load: PageLoad = async ({ params }) => {
   const messages = await connection.messages(params.room);
-  console.log({ messages });
+  // console.log({ messages });
   return { messages: JSON.stringify(messages), room: params.room };
 };

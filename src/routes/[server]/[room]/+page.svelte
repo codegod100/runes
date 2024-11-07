@@ -8,7 +8,7 @@
   onMount(() => {
     const socket = skio.get();
     socket.on("messages", (_messages) => {
-      console.log({ _messages });
+      // console.log({ _messages });
       messages = _messages;
     });
   });
@@ -60,7 +60,7 @@
     /* height: 90%; */
     max-height: 100%;
   }
-  .column{
+  .column {
     overflow-wrap: break-word;
   }
 </style>

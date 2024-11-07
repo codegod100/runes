@@ -22,6 +22,7 @@
     "vite": "^5.0.3"
   },
   "dependencies": {
+    "@atproto/api": "^0.13.14",
     "@atproto/lex-cli": "^0.5.1",
     "@atproto/oauth-client-node": "^0.2.0",
     "better-sqlite3": "^11.5.0",
