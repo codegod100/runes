@@ -1,7 +1,5 @@
 import { createClient } from "$lib/auth/client";
 import { createDb, migrateToLatest } from "$lib/db";
-import dotenv from "dotenv";
-dotenv.config();
 
 export async function auth(handle: string) {
   const { NODE_ENV, HOST, PORT, DB_PATH } = process.env;
