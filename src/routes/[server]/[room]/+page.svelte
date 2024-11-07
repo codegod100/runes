@@ -1,19 +1,30 @@
 <script lang="ts">
   import type { PageData } from "../../$types";
-  import { source } from "sveltekit-sse";
+  // import { source } from "sveltekit-sse";
+  // import { io } from "socket.io-client";
+  import { onMount } from "svelte";
+  import skio from "sveltekit-io";
   let { data }: { data: PageData } = $props();
   let message = $state("");
-  const connection = source(`/sse/${data.room}`);
-  const json = $state(connection.select("message"));
+  // const socket = io();
+  // const connection = source(`/sse/${data.room}`);
+  // const json = $state(connection.select("message"));
   // const messages = JSON.parse($m) as Message[];
-  let messages = $state([]);
-  $effect.pre(() => {
-    try {
-      messages = JSON.parse($json);
-    } catch (e) {
-      console.log("json empty");
-    }
+  let messages = $state(JSON.parse(data.messages));
+  onMount(() => {
+    const socket = skio.get();
+    socket.on("messages", (_messages) => {
+      console.log({ _messages });
+      messages = _messages;
+    });
   });
+  // $effect.pre(() => {
+  //   try {
+  //     messages = JSON.parse($json);
+  //   } catch (e) {
+  //     console.log("json empty");
+  //   }
+  // });
 </script>
 
 <div class="column has-background-dark is-1">
@@ -60,6 +71,6 @@
 <style>
   .chat {
     /* height: 90%; */
-    max-height: 90%;
+    max-height: 100%;
   }
 </style>
