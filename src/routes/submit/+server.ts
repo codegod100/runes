@@ -17,7 +17,7 @@ import { Agent } from "@atproto/api";
 import { createDb, migrateToLatest } from "$lib/db";
 import { createClient } from "$lib/auth/client";
 import { TID } from "@atproto/common";
-
+import { type Result, Ok, Err } from "$lib/result";
 type Session = { did: string };
 const connection = new Connection();
 const did = "did:plc:ngokl2gnmpbvuvrfckja3g7p";
@@ -32,7 +32,10 @@ export type AppContext = {
   resolver: BidirectionalResolver;
 };
 
-async function getSessionAgent(req: Request, res: Response) {
+async function getSessionAgent(
+  req: Request,
+  res: Response
+): Promise<Result<Agent, string>> {
   const session = await getIronSession<Session>(req, res, {
     cookieName: "sid",
     password: process.env.COOKIE_SECRET!,
@@ -44,18 +47,22 @@ async function getSessionAgent(req: Request, res: Response) {
   // if (!session.did) return null;
   try {
     const oauthSession = await oauthClient.restore(did);
-    return oauthSession ? new Agent(oauthSession) : null;
+    return Ok(new Agent(oauthSession));
   } catch (err) {
     console.log({ err });
+    return Err(err.message());
     // ctx.logger.warn({ err }, "oauth restore failed");
     session.destroy();
-    return null;
   }
+  // return Err("something went wrong");
 }
 
 export async function POST({ request }) {
   const { room, message } = await request.json();
   let agent = await getSessionAgent(request, json(""));
+  if (!agent.ok) {
+    return json(agent.error);
+  }
   console.log({ agent });
   const rkey = TID.nextStr();
   const record = {
@@ -63,8 +70,9 @@ export async function POST({ request }) {
     content: message,
     room: "at://did:plc:bpmiiiabnbf2hf7uuqdbjne6/social.psky.chat.room/3l6k3isiuzb2j",
   };
-  const res = await agent.com.atproto.repo.putRecord({
-    repo: agent.assertDid,
+
+  const res = await agent.value.com.atproto.repo.putRecord({
+    repo: agent.value.assertDid,
     collection: "social.psky.chat.message",
     rkey,
     record,
