@@ -1,11 +1,17 @@
 import pino from "pino";
 import { IdResolver } from "@atproto/identity";
 import { Firehose } from "@atproto/sync";
-import type { Database } from "$lib/db";
-import * as Status from "#/lexicon/types/xyz/statusphere/status";
+// import type { Database } from "$lib/db";
+// import * as Status from "#/lexicon/types/xyz/statusphere/status";
+// const Message = require("$lib/lexicon/types/social/psky/chat/message");
+import { Connection } from "$lib/storage";
 
-export function createIngester(db: Database, idResolver: IdResolver) {
+const connection = new Connection();
+
+export function createIngester(idResolver: IdResolver) {
   const logger = pino({ name: "firehose ingestion" });
+  logger.info("creating ingester");
+  console.log("creating ingester");
   return new Firehose({
     idResolver,
     handleEvent: async (evt) => {
@@ -16,44 +22,32 @@ export function createIngester(db: Database, idResolver: IdResolver) {
         const record = evt.record;
 
         // If the write is a valid status update
-        if (
-          evt.collection === "xyz.statusphere.status" &&
-          Status.isRecord(record) &&
-          Status.validateRecord(record).success
-        ) {
+        if (evt.collection === "social.psky.chat.message") {
+          console.log({ record });
           // Store the status in our SQLite
-          await db
-            .insertInto("status")
-            .values({
-              uri: evt.uri.toString(),
-              authorDid: evt.did,
-              status: record.status,
-              createdAt: record.createdAt,
-              indexedAt: now.toISOString(),
-            })
-            .onConflict((oc) =>
-              oc.column("uri").doUpdateSet({
-                status: record.status,
-                indexedAt: now.toISOString(),
-              })
-            )
-            .execute();
+          // await db
+          //   .insertInto("status")
+          //   .values({
+          //     uri: evt.uri.toString(),
+          //     authorDid: evt.did,
+          //     status: record.status,
+          //     createdAt: record.createdAt,
+          //     indexedAt: now.toISOString(),
+          //   })
+          //   .onConflict((oc) =>
+          //     oc.column("uri").doUpdateSet({
+          //       status: record.status,
+          //       indexedAt: now.toISOString(),
+          //     })
+          //   )
+          //   .execute();
         }
-      } else if (
-        evt.event === "delete" &&
-        evt.collection === "xyz.statusphere.status"
-      ) {
-        // Remove the status from our SQLite
-        await db
-          .deleteFrom("status")
-          .where("uri", "=", evt.uri.toString())
-          .execute();
       }
     },
     onError: (err) => {
       logger.error({ err }, "error on firehose ingestion");
     },
-    filterCollections: ["xyz.statusphere.status"],
+    filterCollections: ["social.psky.chat.message"],
     excludeIdentity: true,
     excludeAccount: true,
   });

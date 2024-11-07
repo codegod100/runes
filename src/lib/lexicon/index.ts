@@ -18,11 +18,13 @@ export class Server {
   xrpc: XrpcServer
   social: SocialNS
   app: AppNS
+  com: ComNS
 
   constructor(options?: XrpcOptions) {
     this.xrpc = createXrpcServer(schemas, options)
     this.social = new SocialNS(this)
     this.app = new AppNS(this)
+    this.com = new ComNS(this)
   }
 }
 
@@ -38,11 +40,21 @@ export class SocialNS {
 
 export class SocialPskyNS {
   _server: Server
+  richtext: SocialPskyRichtextNS
   chat: SocialPskyChatNS
 
   constructor(server: Server) {
     this._server = server
+    this.richtext = new SocialPskyRichtextNS(server)
     this.chat = new SocialPskyChatNS(server)
+  }
+}
+
+export class SocialPskyRichtextNS {
+  _server: Server
+
+  constructor(server: Server) {
+    this._server = server
   }
 }
 
@@ -75,6 +87,34 @@ export class AppBskyNS {
 }
 
 export class AppBskyActorNS {
+  _server: Server
+
+  constructor(server: Server) {
+    this._server = server
+  }
+}
+
+export class ComNS {
+  _server: Server
+  atproto: ComAtprotoNS
+
+  constructor(server: Server) {
+    this._server = server
+    this.atproto = new ComAtprotoNS(server)
+  }
+}
+
+export class ComAtprotoNS {
+  _server: Server
+  repo: ComAtprotoRepoNS
+
+  constructor(server: Server) {
+    this._server = server
+    this.repo = new ComAtprotoRepoNS(server)
+  }
+}
+
+export class ComAtprotoRepoNS {
   _server: Server
 
   constructor(server: Server) {

@@ -1,11 +1,21 @@
-import { Database } from "bun:sqlite";
-export class Message {
+// import { Database } from "bun:sqlite";
+import sqlite from "sqlite3";
+
+// export class Message {
+//   id: number;
+//   text: string;
+//   author: string;
+//   channel: string;
+//   server: string; //did of server
+// }
+
+type Message = {
   id: number;
   text: string;
   author: string;
   channel: string;
-  server: string; //did of server
-}
+  server: string;
+};
 class Server {
   did: string;
 }
@@ -15,45 +25,62 @@ class Channel {
 }
 
 export class Connection {
-  db: Database;
+  db: sqlite.Database;
   last_query: string;
   constructor() {
-    const db = new Database("runes.db");
+    // const db = new Database("runes.db");
+    const db = new sqlite.Database("runes.db");
     this.db = db;
     db.exec("PRAGMA journal_mode = WAL;");
     try {
       db.run(
         `create table messages(id integer primary key, created_at text, text text, author text, channel text, server text);
-         create table servers(did text primary key);`
+         create table servers(did text primary key);`,
+        (err) => {
+          console.log({ err });
+        }
       );
     } catch (e) {
       // console.log(e);
     }
   }
-  messages(channel: string): Message[] {
-    let messages: Message[];
-    if (this.last_query) {
-      const query = this.db
-        .query(
+  async messages(channel: string): Promise<Message[]> {
+    let messages: Message[] = [];
+    let promise: Promise<Message[]> = new Promise((resolve, reject) => {
+      if (this.last_query) {
+        const query = this.db.prepare(
           `select * from messages where channel = $channel and created_at > $last_query`
-        )
-        .as(Message);
-      messages = query.all({ $channel: channel, $last_query: this.last_query });
-    } else {
-      const query = this.db
-        .query(`select * from messages where channel = $channel`)
-        .as(Message);
-      messages = query.all({ $channel: channel });
-    }
-    if (messages.length) {
-      //   console.log({ messages });
-      //   console.log({ length: messages.length });
-      //   this.last_query = new Date().toISOString();
-    }
-    return messages;
+        );
+
+        query.each(
+          {
+            $channel: channel,
+            $last_query: this.last_query,
+          },
+          (err, row) => {
+            console.log({ err });
+            let message: Message = row as Message;
+            messages.push(message);
+          }
+        );
+      } else {
+        const query = this.db.prepare(
+          `select * from messages where channel = $channel`
+        );
+        query.all({ $channel: channel }, (err, rows) => {
+          console.log({ err });
+          if (err) {
+            reject(err);
+          }
+
+          resolve(rows as Message[]);
+        });
+      }
+    });
+    return promise;
   }
   insertMessage(text: string, author: string, channel: string): void {
-    const query = this.db.query(
+    const query = this.db.prepare(
       "insert into messages (text, author, channel, created_at) values ($text, $author, $channel, $created_at)"
     );
     query.run({
