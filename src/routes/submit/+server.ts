@@ -12,15 +12,11 @@ import {
   createIdResolver,
   type BidirectionalResolver,
 } from "$lib/id-resolver";
-import { getIronSession } from "iron-session";
-import { Agent } from "@atproto/api";
-import { createDb, migrateToLatest } from "$lib/db";
-import { createClient } from "$lib/auth/client";
+
 import { TID } from "@atproto/common";
-import { type Result, Ok, Err } from "$lib/result";
-type Session = { did: string };
+import { getSessionAgent } from "$lib/agent.js";
 const connection = new Connection();
-const did = "did:plc:ngokl2gnmpbvuvrfckja3g7p";
+
 // const io = new Server();
 const socket = skio.get();
 
@@ -31,31 +27,6 @@ export type AppContext = {
   oauthClient: OAuthClient;
   resolver: BidirectionalResolver;
 };
-
-async function getSessionAgent(
-  req: Request,
-  res: Response
-): Promise<Result<Agent, string>> {
-  const session = await getIronSession<Session>(req, res, {
-    cookieName: "sid",
-    password: process.env.COOKIE_SECRET!,
-  });
-  console.log({ session });
-  const db = createDb(process.env.DB_PATH!);
-  const oauthClient = await createClient(db);
-  // console.log({ oauthClient });
-  // if (!session.did) return null;
-  try {
-    const oauthSession = await oauthClient.restore(did);
-    return Ok(new Agent(oauthSession));
-  } catch (err) {
-    console.log({ err });
-    return Err(err.message());
-    // ctx.logger.warn({ err }, "oauth restore failed");
-    session.destroy();
-  }
-  // return Err("something went wrong");
-}
 
 export async function POST({ request }) {
   const { room, message } = await request.json();
