@@ -3,8 +3,8 @@ import {
   Kysely,
   Migrator,
   SqliteDialect,
-  Migration,
-  MigrationProvider,
+  type Migration,
+  type MigrationProvider,
 } from "kysely";
 
 // Types

@@ -5,6 +5,7 @@ import { Firehose } from "@atproto/sync";
 // import * as Status from "#/lexicon/types/xyz/statusphere/status";
 // const Message = require("$lib/lexicon/types/social/psky/chat/message");
 import { Connection } from "$lib/storage";
+import skio from "sveltekit-io";
 
 const connection = new Connection();
 
@@ -15,6 +16,7 @@ export function createIngester(idResolver: IdResolver) {
   return new Firehose({
     idResolver,
     handleEvent: async (evt) => {
+      const socket = skio.get();
       logger.info(evt);
       // Watch for write events
       if (evt.event === "create" || evt.event === "update") {
@@ -24,6 +26,10 @@ export function createIngester(idResolver: IdResolver) {
         // If the write is a valid status update
         if (evt.collection === "social.psky.chat.message") {
           console.log({ record });
+          connection.insertMessage(record.content, evt.did, record.room);
+          const messages = await connection.messages(record.room);
+          console.log({ messages });
+          socket.emit("messages", messages);
           // Store the status in our SQLite
           // await db
           //   .insertInto("status")

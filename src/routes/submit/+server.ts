@@ -9,7 +9,8 @@ const socket = skio.get();
 export async function POST({ request }) {
   const { room, message } = await request.json();
   connection.insertMessage(message, did, room);
-  const messages = connection.messages(room);
+  const messages = await connection.messages(room);
+  console.log({ messages });
   socket.emit("messages", messages);
   return json("OK");
 }

@@ -22,7 +22,7 @@
 </div>
 <div class="column is-2 has-background-black-ter">
   <div>Channels</div>
-  <div>#yolo</div>
+  <div>{data.room}</div>
 </div>
 <div class="column chat">
   <div>Chat</div>
@@ -59,5 +59,8 @@
   .chat {
     /* height: 90%; */
     max-height: 100%;
+  }
+  .column{
+    overflow-wrap: break-word;
   }
 </style>
