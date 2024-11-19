@@ -6,6 +6,9 @@
 <div class="container mt-5">
   <div>Server page</div>
   <div>
+    <a href={`/${data.server}/${data.room}`}>ROOM</a>
+  </div>
+  <div>
     <form
       onsubmit={(e) => {
         e.preventDefault();

@@ -11,5 +11,9 @@ export const load: PageLoad = async ({ params, request }) => {
     collection: "ooo.demon.chat.server",
   });
   console.log({ res });
-  return { records: res.data.records };
+  const enc = encodeURIComponent;
+  // const server = enc(params.server)
+  const server = enc(params.server);
+  const room = enc("at://did:plc:b3pn34agqqchkaf75v7h43dk/social.psky.chat.room/3lat3axu4bk2u")
+  return { records: res.data.records, server, room };
 };

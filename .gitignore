@@ -22,3 +22,4 @@ vite.config.ts.timestamp-*
 
 
 runes.db*
+oauth.db*
