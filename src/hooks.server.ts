@@ -1,10 +1,10 @@
 import { createIdResolver } from "$lib/id-resolver";
 import { createIngester } from "$lib/ingester.js";
 import PocketBase from 'pocketbase';
-import { POCKET_BASE } from "$env/static/private";
+import { PUBLIC_POCKET_BASE } from "$env/static/public";
 import dotenv from "dotenv";
 import createSocket from "$lib/websocket";
-const pb = new PocketBase(POCKET_BASE);
+const pb = new PocketBase(PUBLIC_POCKET_BASE);
 console.log("server hooks")
 dotenv.config();
 // const baseIdResolver = createIdResolver();

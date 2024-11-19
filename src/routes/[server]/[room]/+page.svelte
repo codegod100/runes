@@ -1,16 +1,29 @@
 <script lang="ts">
   import type { PageData } from "../../$types";
   import { onMount } from "svelte";
-  import skio from "sveltekit-io";
+  import PocketBase from "pocketbase";
+  import { PUBLIC_POCKET_BASE } from "$env/static/public";
+  const pb = new PocketBase(PUBLIC_POCKET_BASE);
+  // import skio from "sveltekit-io";
   let { data }: { data: PageData } = $props();
   let message = $state("");
   let messages = $state(JSON.parse(data.messages));
-  onMount(() => {
-    const socket = skio.get();
-    socket.on("messages", (_messages) => {
-      // console.log({ _messages });
-      messages = _messages;
-    });
+  let items = $state([]);
+  async function getMessages() {
+    const resultList = await pb.collection("messages").getList(1, 50, {});
+    items = resultList.items;
+    console.log({ resultList });
+  }
+  onMount(async () => {
+    // const socket = skio.get();
+    // socket.on("messages", (_messages) => {
+    //   // console.log({ _messages });
+    //   messages = _messages;
+    // });
+    await getMessages();
+  });
+  pb.collection("messages").subscribe("*", function (e) {
+    getMessages();
   });
 </script>
 
@@ -27,8 +40,8 @@
 <div class="column chat">
   <div>Chat</div>
   <div class="chat">
-    {#each messages as message}
-      <div>{message.author}: {message.text}</div>
+    {#each items as message}
+      <div>{message.did}: {message.content}</div>
     {/each}
   </div>
   <div>
