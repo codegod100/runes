@@ -10,8 +10,10 @@
   let messages = $state(JSON.parse(data.messages));
   let items = $state([]);
   async function getMessages() {
-    const resultList = await pb.collection("messages").getList(1, 50, {});
-    items = resultList.items;
+    const resultList = await pb
+      .collection("messages")
+      .getList(1, 30, { sort: "-created" });
+    items = resultList.items.reverse();
     console.log({ resultList });
   }
   onMount(async () => {
@@ -21,9 +23,9 @@
     //   messages = _messages;
     // });
     await getMessages();
-  });
-  pb.collection("messages").subscribe("*", function (e) {
-    getMessages();
+    pb.collection("messages").subscribe("*", function (e) {
+      getMessages();
+    });
   });
 </script>
 
@@ -37,12 +39,16 @@
   <div>Channels</div>
   <div>{data.room}</div>
 </div>
-<div class="column chat">
+<div class="column">
   <div>Chat</div>
-  <div class="chat">
+  <div class="chat" id="scroller">
     {#each items as message}
-      <div>{message.did}: {message.content}</div>
+      <div class="mb-1">
+        <span class="has-text-weight-bold">{message.handle || message.did}</span
+        >: {message.content}
+      </div>
     {/each}
+    <div id="anchor"></div>
   </div>
   <div>
     <form
@@ -71,9 +77,19 @@
 <style>
   .chat {
     /* height: 90%; */
-    max-height: 100%;
+    /* max-height: 90%; */
+    height: 100%;
+    overflow: scroll;
   }
   .column {
     overflow-wrap: break-word;
+  }
+
+  #scroller * {
+    overflow-anchor: none;
+  }
+  #anchor {
+    overflow-anchor: auto;
+    height: 1px;
   }
 </style>
