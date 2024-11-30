@@ -7,13 +7,19 @@
   // import skio from "sveltekit-io";
   let { data }: { data: PageData } = $props();
   let message = $state("");
-  let messages = $state(JSON.parse(data.messages));
   let items = $state([]);
+  let scroller;
+  async function scrollToBottom() {
+    console.log("scrollin")
+    scroller.scroll({ top: scroller.scrollHeight, behavior: 'smooth' });
+  }
   async function getMessages() {
     const resultList = await pb
       .collection("messages")
       .getList(1, 30, { sort: "-created" });
     items = resultList.items.reverse();
+
+
     console.log({ resultList });
   }
   onMount(async () => {
@@ -23,8 +29,10 @@
     //   messages = _messages;
     // });
     await getMessages();
-    pb.collection("messages").subscribe("*", function (e) {
-      getMessages();
+     scrollToBottom();
+    pb.collection("messages").subscribe("*", async function (e) {
+      await getMessages();
+      scrollToBottom();
     });
   });
 </script>
@@ -41,7 +49,7 @@
 </div>
 <div class="column">
   <div>Chat</div>
-  <div class="chat" id="scroller">
+  <div class="chat" id="scroller" bind:this={scroller}>
     {#each items as message}
       <div class="mb-1">
         <span class="has-text-weight-bold">{message.handle || message.did}</span
@@ -50,6 +58,9 @@
     {/each}
     <div id="anchor"></div>
   </div>
+  <div>
+      <button onclick={scrollToBottom}>Scroll to bottom</button>
+      </div>
   <div>
     <form
       autocomplete="off"
@@ -76,8 +87,6 @@
 
 <style>
   .chat {
-    /* height: 90%; */
-    /* max-height: 90%; */
     height: 100%;
     overflow: scroll;
   }
@@ -85,11 +94,5 @@
     overflow-wrap: break-word;
   }
 
-  #scroller * {
-    overflow-anchor: none;
-  }
-  #anchor {
-    overflow-anchor: auto;
-    height: 1px;
-  }
+
 </style>

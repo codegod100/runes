@@ -44,6 +44,6 @@ export const actions = {
       did: agent.value.assertDid,
       cid: res.data.blob.ref.toString(),
     });
-    console.log(JSON.stringify(blob));
+    console.log({ blob });
   },
 };

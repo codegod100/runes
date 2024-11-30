@@ -1,8 +1,6 @@
 import { NodeOAuthClient } from "@atproto/oauth-client-node";
-import type { Database } from "$lib/db";
-import { SessionStore, StateStore } from "$lib/auth/storage";
-
-export const createClient = async (db: Database) => {
+import { StateStore, SessionStore } from "./storage";
+export const createClient = async () => {
   const publicUrl = process.env.PUBLIC_URL;
   const url = publicUrl || `http://127.0.0.1:${process.env.PORT}`;
   const enc = encodeURIComponent;
@@ -21,7 +19,7 @@ export const createClient = async (db: Database) => {
       token_endpoint_auth_method: "none",
       dpop_bound_access_tokens: true,
     },
-    stateStore: new StateStore(db),
-    sessionStore: new SessionStore(db),
+    stateStore: new StateStore(),
+    sessionStore: new SessionStore(),
   });
 };
