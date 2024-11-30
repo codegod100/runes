@@ -2,6 +2,7 @@
   import type { PageData } from "../../$types";
   import { onMount } from "svelte";
   import PocketBase from "pocketbase";
+  import anchors from "$lib/anchors"
   import { PUBLIC_POCKET_BASE } from "$env/static/public";
   const pb = new PocketBase(PUBLIC_POCKET_BASE);
   // import skio from "sveltekit-io";
@@ -53,7 +54,7 @@
     {#each items as message}
       <div class="mb-1">
         <span class="has-text-weight-bold">{message.handle || message.did}</span
-        >: {message.content}
+        >: {@html anchors(message.content)}
       </div>
     {/each}
     <div id="anchor"></div>
