@@ -5,9 +5,9 @@
   import PocketBase from "pocketbase";
   import anchors from "$lib/anchors"
   import { PUBLIC_POCKET_BASE } from "$env/static/public";
-  console.log({ PUBLIC_POCKET_BASE });
   const pb = new PocketBase(PUBLIC_POCKET_BASE);
   let { data }: { data: PageData } = $props();
+  let did = $state("");
   let message = $state("");
   let items = $state([]);
   let scroller;
@@ -42,7 +42,8 @@
 <div class="column has-background-dark is-1">
     {#if !data.logged_in}
   <div data-sveltekit-reload class="mb-3">
-    <a href="/oauth" class="button is-primary is-small is-rounded">Login</a>
+      <input class="input" type="text" placeholder="DID" bind:value={did} />
+    <a href={`/oauth/${did}`} class="button is-primary">Login</a>
   </div>
   {/if}
   <div>Servers</div>
