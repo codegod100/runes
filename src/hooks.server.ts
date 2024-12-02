@@ -4,9 +4,11 @@ import { PUBLIC_POCKET_BASE } from "$env/static/public";
 import dotenv from "dotenv";
 import createSocket from "$lib/websocket";
 import { DidResolver } from "@atproto/identity";
+import pino from "pino";
+const logger = pino();
 const didres = new DidResolver({});
 const pb = new PocketBase(PUBLIC_POCKET_BASE);
-console.log("server hooks");
+logger.info("server hooks");
 dotenv.config();
 // const baseIdResolver = createIdResolver();
 // const ingester = createIngester(baseIdResolver);
@@ -14,9 +16,9 @@ dotenv.config();
 const jetstream = createSocket();
 jetstream.start();
 jetstream.onCreate("social.psky.chat.message", async (event) => {
-  console.log(JSON.stringify(event));
+  logger.info(JSON.stringify(event));
   const doc = await didres.resolveAtprotoData(event.did);
-  console.log({ doc });
+  logger.info({ doc });
   const data = {
     room: event.commit.record.room,
     content: event.commit.record.content,
@@ -28,22 +30,11 @@ jetstream.onCreate("social.psky.chat.message", async (event) => {
   const record = await pb
     .collection("messages")
     .create(data)
-    .catch((e) => console.log({ e }));
-  console.log({ record });
+    .catch((e) => logger.info({ e }));
+  logger.info({ record });
 });
 
-// jetstream.
-//     on("account", (
-//         event) => {
-
-//         console.
-//             log("account update",
-//                 event.
-//                     account.
-//                     status)
-//     });
-
 jetstream.on("error", (err) => {
-  console.log("error");
-  console.log({ err });
+  logger.info("error");
+  logger.info({ err });
 });

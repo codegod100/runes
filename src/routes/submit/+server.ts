@@ -2,14 +2,16 @@ import { getSessionAgent } from "$lib/agent.js";
 import { json } from "@sveltejs/kit";
 import { TID } from "@atproto/common";
 import getCookieStore from "$lib/cookies";
+import pino from "pino";
 
+const logger = pino();
 export async function POST({ request, cookies }) {
   const { room, message } = await request.json();
   let agent = await getSessionAgent(getCookieStore(cookies));
   if (!agent.ok) {
-    return json(agent.error);
+    return json(agent.error, { status: 401 });
   }
-  console.log({ agent: agent.value });
+  logger.info({ agent: agent.value });
   const rkey = TID.nextStr();
   const record = {
     $type: "social.psky.chat.message",
@@ -24,7 +26,7 @@ export async function POST({ request, cookies }) {
     record,
     validate: false,
   });
-  console.log({ res });
+  logger.info({ res });
 
   return json("OK");
 }
