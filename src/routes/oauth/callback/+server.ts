@@ -1,6 +1,7 @@
 import { createClient } from "$lib/auth/client";
 import { json } from "@sveltejs/kit";
 import { getIronSession } from "iron-session";
+import { redirect } from "@sveltejs/kit";
 
 type Session = { did: string };
 
@@ -13,5 +14,5 @@ export async function GET({ request, params, url }) {
   });
   clientSession.did = session.did;
   await clientSession.save();
-  return json("yolo");
+  redirect(307, "/foo/bar");
 }

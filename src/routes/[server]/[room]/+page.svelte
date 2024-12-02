@@ -40,6 +40,11 @@
 </script>
 
 <div class="column has-background-dark is-1">
+    {#if !data.logged_in}
+  <div data-sveltekit-reload class="mb-3">
+    <a href="/oauth" class="button is-primary is-small is-rounded">Login</a>
+  </div>
+  {/if}
   <div>Servers</div>
   <div>
     <img alt="test" class="image is-64x64 is-rounded" src="/duck.png" />
@@ -85,7 +90,6 @@
     </form>
   </div>
 </div>
-
 <style>
   .chat {
     height: 100%;

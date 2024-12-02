@@ -21,7 +21,7 @@ export async function getSessionAgent(
     return Ok(new Agent(oauthSession));
   } catch (err) {
     console.log({ err });
-    return Err(err.message());
+    return Err(err.message);
     // ctx.logger.warn({ err }, "oauth restore failed");
     session.destroy();
   }

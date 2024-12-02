@@ -1,6 +1,7 @@
 import { getSessionAgent } from "$lib/agent.js";
 import { json } from "@sveltejs/kit";
 import { TID } from "@atproto/common";
+
 export async function POST({ request }) {
   const { room, message } = await request.json();
   let agent = await getSessionAgent(request, json(""));
