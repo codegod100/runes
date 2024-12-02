@@ -1,10 +1,11 @@
 import { getSessionAgent } from "$lib/agent.js";
 import { json } from "@sveltejs/kit";
 import { TID } from "@atproto/common";
+import getCookieStore from "$lib/cookies";
 
-export async function POST({ request }) {
+export async function POST({ request, cookies }) {
   const { room, message } = await request.json();
-  let agent = await getSessionAgent(request, json(""));
+  let agent = await getSessionAgent(getCookieStore(cookies));
   if (!agent.ok) {
     return json(agent.error);
   }

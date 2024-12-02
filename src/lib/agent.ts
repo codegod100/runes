@@ -3,21 +3,19 @@ import { Agent } from "@atproto/api";
 import { createClient } from "$lib/auth/client";
 import { type Result, Ok, Err } from "$lib/result";
 type Session = { did: string };
-const did = "did:plc:ngokl2gnmpbvuvrfckja3g7p";
-export async function getSessionAgent(
-  req: Request,
-  res: Response,
-): Promise<Result<Agent, string>> {
-  const session = await getIronSession<Session>(req, res, {
+// const did = "did:plc:ngokl2gnmpbvuvrfckja3g7p";
+export async function getSessionAgent(cookies): Promise<Result<Agent, string>> {
+  console.log({ cookies });
+  const session = await getIronSession(cookies, {
     cookieName: "sid",
     password: process.env.COOKIE_SECRET!,
   });
   console.log({ session });
   const oauthClient = await createClient();
   // console.log({ oauthClient });
-  // if (!session.did) return null;
+  if (!session.did) return Err("no did");
   try {
-    const oauthSession = await oauthClient.restore(did);
+    const oauthSession = await oauthClient.restore(session.did);
     return Ok(new Agent(oauthSession));
   } catch (err) {
     console.log({ err });
