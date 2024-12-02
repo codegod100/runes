@@ -10,6 +10,10 @@ export const createClient = async () => {
       client_id: publicUrl
         ? `${url}/client-metadata.json`
         : `http://localhost?redirect_uri=${enc(`${url}/oauth/callback`)}&scope=${enc("atproto transition:generic")}`,
+      // client_id: publicUrl
+      //   ? `${url}?redirect_uri=${enc(`${url}/oauth/callback`)}&scope=${enc("atproto transition:generic")}`
+      //   : `http://localhost?redirect_uri=${enc(`${url}/oauth/callback`)}&scope=${enc("atproto transition:generic")}`,
+
       client_uri: url,
       redirect_uris: [`${url}/oauth/callback`],
       scope: "atproto transition:generic",

@@ -7,7 +7,7 @@ export async function POST({ request }) {
   if (!agent.ok) {
     return json(agent.error);
   }
-  console.log({ agent });
+  console.log({ agent: agent.value });
   const rkey = TID.nextStr();
   const record = {
     $type: "social.psky.chat.message",

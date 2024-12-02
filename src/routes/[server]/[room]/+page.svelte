@@ -1,11 +1,12 @@
 <script lang="ts">
   import type { PageData } from "../../$types";
   import { onMount } from "svelte";
+  import {format} from 'timeago.js'
   import PocketBase from "pocketbase";
   import anchors from "$lib/anchors"
   import { PUBLIC_POCKET_BASE } from "$env/static/public";
+  console.log({ PUBLIC_POCKET_BASE });
   const pb = new PocketBase(PUBLIC_POCKET_BASE);
-  // import skio from "sveltekit-io";
   let { data }: { data: PageData } = $props();
   let message = $state("");
   let items = $state([]);
@@ -17,7 +18,7 @@
   async function getMessages() {
     const resultList = await pb
       .collection("messages")
-      .getList(1, 30, { sort: "-created" });
+      .getList(1, 100, { sort: "-created" });
     items = resultList.items.reverse();
 
 
@@ -53,11 +54,10 @@
   <div class="chat" id="scroller" bind:this={scroller}>
     {#each items as message}
       <div class="mb-1">
-        <span class="has-text-weight-bold">{message.handle || message.did}</span
+        <span class="has-text-weight-bold">({format(message.created)}) {message.handle || message.did}</span
         >: {@html anchors(message.content)}
       </div>
     {/each}
-    <div id="anchor"></div>
   </div>
   <div>
       <button onclick={scrollToBottom}>Scroll to bottom</button>
@@ -90,6 +90,7 @@
   .chat {
     height: 100%;
     overflow: scroll;
+    overflow-x: hidden;
   }
   .column {
     overflow-wrap: break-word;

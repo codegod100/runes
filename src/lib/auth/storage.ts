@@ -5,8 +5,8 @@ import type {
   NodeSavedStateStore,
 } from "@atproto/oauth-client-node";
 import PocketBase from "pocketbase";
-
-const pb = new PocketBase("http://127.0.0.1:8090");
+import { PUBLIC_POCKET_BASE } from "$env/static/public";
+const pb = new PocketBase(PUBLIC_POCKET_BASE);
 
 export class StateStore implements NodeSavedStateStore {
   async get(key: string): Promise<NodeSavedState | undefined> {
