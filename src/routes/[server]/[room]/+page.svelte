@@ -48,6 +48,10 @@
       <input class="input" type="text" placeholder="DID" bind:value={did} />
     <a href={`/oauth/${did}`} class="button is-primary">Login</a>
   </div>
+  {:else}
+  <div data-sveltekit-reload class="mb-3">
+    <a href={`/logout`} class="button is-primary">Logout</a>
+  </div>
   {/if}
   <div>Servers</div>
   <div>
