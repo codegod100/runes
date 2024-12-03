@@ -4,9 +4,11 @@
   import {format} from 'timeago.js'
   import PocketBase from "pocketbase";
   import anchors from "$lib/anchors"
+  import channelMap from "$lib/channel_map"
   import { PUBLIC_POCKET_BASE } from "$env/static/public";
   const pb = new PocketBase(PUBLIC_POCKET_BASE);
   let { data }: { data: PageData } = $props();
+  const room = channelMap[data.room];
   let did = $state("");
   let message = $state("");
   let items = $state([]);
@@ -16,9 +18,10 @@
     scroller.scroll({ top: scroller.scrollHeight, behavior: 'smooth' });
   }
   async function getMessages() {
+
     const resultList = await pb
       .collection("messages")
-      .getList(1, 100, { sort: "-created" });
+      .getList(1, 100, { sort: "-created", filter: `room="${room}"` });
     items = resultList.items.reverse();
 
 
@@ -51,9 +54,10 @@
     <img alt="test" class="image is-64x64 is-rounded" src="/duck.png" />
   </div>
 </div>
-<div class="column is-2 has-background-black-ter">
+<div  data-sveltekit-reload class="column is-2 has-background-black-ter">
   <div>Channels</div>
-  <div>{data.room}</div>
+  <div><a href="/main/default">default</a></div>
+  <div><a href="/main/test">test</a></div>
 </div>
 <div class="column">
   <div>Chat</div>
@@ -77,7 +81,7 @@
         message = "";
         fetch("/submit", {
           method: "POST",
-          body: JSON.stringify({ room: data.room, message: m2 }),
+          body: JSON.stringify({ room, message: m2 }),
         });
       }}
     >
