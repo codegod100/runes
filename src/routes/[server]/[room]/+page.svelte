@@ -6,14 +6,14 @@
   import anchors from "$lib/anchors"
   import channelMap from "$lib/channel_map"
   import { PUBLIC_POCKET_BASE } from "$env/static/public";
-  import pino from "pino";
-  const logger = pino();
+
   const pb = new PocketBase(PUBLIC_POCKET_BASE);
   let { data }: { data: PageData } = $props();
   let room = $state(channelMap[data.room]);
   let did = $state("");
   let message = $state("");
   let items = $state([]);
+  let input
   let scroller;
   $effect( async ()=>{
     console.log("effect",data, room)
@@ -75,10 +75,13 @@
 <div class="column">
   <div>Chat</div>
   <div class="chat" id="scroller" bind:this={scroller}>
-    {#each items as message}
+    {#each items as m}
       <div class="mb-1">
-        <span class="has-text-weight-bold">({format(message.created)}) {message.handle || message.did}</span
-        >: {@html anchors(message.content)}
+        <span class={m.content.includes(data.handle) && "has-text-weight-bold is-large is-italic"}>({format(m.created)}) <span class="grab" onclick={()=>{
+          message = message +(m.handle || m.did)+" "
+          input.focus()
+        }}>{m.handle || m.did}</span></span
+        >: {@html anchors(m.content)}
       </div>
     {/each}
   </div>
@@ -104,6 +107,7 @@
         type="text"
         autofocus
         bind:value={message}
+        bind:this={input}
       />
     </form>
   </div>
@@ -116,6 +120,9 @@
   }
   .column {
     overflow-wrap: break-word;
+  }
+  .grab{
+      cursor: pointer;
   }
 
 

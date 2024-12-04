@@ -14,8 +14,8 @@ export async function getSessionAgent(
     cookieName: "sid",
     password: process.env.COOKIE_SECRET!,
   });
-  const oauthClient = await createClient();
   if (!session.did) return Err("no did");
+  const oauthClient = await createClient();
   try {
     const oauthSession = await oauthClient.restore(session.did);
     return Ok(new Agent(oauthSession));
