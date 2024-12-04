@@ -13,5 +13,6 @@ export const load: PageLoad = async ({ params, request, cookies }) => {
     logged_in = true;
   }
 
+  logger.info({ room: params.room, logged_in });
   return { room: params.room, logged_in };
 };

@@ -15,5 +15,5 @@ export async function GET({ request, params, url, cookies }) {
   clientSession.did = session.did;
   await clientSession.save();
   // return json("test");
-  redirect(307, "/foo/bar");
+  redirect(307, "/");
 }

@@ -6,16 +6,24 @@
   import anchors from "$lib/anchors"
   import channelMap from "$lib/channel_map"
   import { PUBLIC_POCKET_BASE } from "$env/static/public";
+  import pino from "pino";
+  const logger = pino();
   const pb = new PocketBase(PUBLIC_POCKET_BASE);
   let { data }: { data: PageData } = $props();
-  const room = channelMap[data.room];
+  let room = $state(channelMap[data.room]);
   let did = $state("");
   let message = $state("");
   let items = $state([]);
   let scroller;
+  $effect( async ()=>{
+    console.log("effect",data, room)
+    room = channelMap[data.room];
+    await getMessages();
+    scrollToBottom()
+  })
   async function scrollToBottom() {
     console.log("scrollin")
-    scroller.scroll({ top: scroller.scrollHeight, behavior: 'smooth' });
+    scroller.scroll({ top: scroller.scrollHeight, behavior: 'auto' });
   }
   async function getMessages() {
 
@@ -28,6 +36,7 @@
     console.log({ resultList });
   }
   onMount(async () => {
+    console.log("mounted");
     // const socket = skio.get();
     // socket.on("messages", (_messages) => {
     //   // console.log({ _messages });
@@ -58,10 +67,10 @@
     <img alt="test" class="image is-64x64 is-rounded" src="/duck.png" />
   </div>
 </div>
-<div  data-sveltekit-reload class="column is-2 has-background-black-ter">
+<div   class="column is-2 has-background-black-ter" >
   <div>Channels</div>
-  <div><a href="/main/default">default</a></div>
-  <div><a href="/main/test">test</a></div>
+  <div><a href="/main/default" >default</a></div>
+  <div><a href="/main/test" >test</a></div>
 </div>
 <div class="column">
   <div>Chat</div>
