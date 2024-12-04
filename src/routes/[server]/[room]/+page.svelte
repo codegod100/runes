@@ -77,11 +77,11 @@
   <div class="chat" id="scroller" bind:this={scroller}>
     {#each items as m}
       <div class="mb-1">
-        <span class={m.content.includes(data.handle) && "has-text-weight-bold is-large is-italic"}>({format(m.created)}) <span class="grab" onclick={()=>{
+        <span class={data.handle && m.content.includes(data.handle) && "has-text-weight-bold is-large is-italic has-background-dark"}>({format(m.created)}) <span class="grab" onclick={()=>{
           message = message +(m.handle || m.did)+" "
           input.focus()
-        }}>{m.handle || m.did}</span></span
-        >: {@html anchors(m.content)}
+        }}>{m.handle || m.did}</span>: {@html anchors(m.content)}</span
+        >
       </div>
     {/each}
   </div>
